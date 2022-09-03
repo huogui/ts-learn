@@ -84,3 +84,82 @@ const uniqueSymbolFoo:  symbol = Symbol("linbudu")
 // 类型不兼容
 const uniqueSymbolBar:  symbol = uniqueSymbolFoo
 
+
+function test(a:string):string | void{
+    return a
+}
+
+test('te')
+
+function reset(arg1:string,...reset:[string,number,boolean]){
+
+}
+
+
+function func(foo: number, bar: true): string;
+function func(foo: number, bar?: false): number;
+function func(foo: number, bar?: boolean): string | number {
+  if (bar) {
+    return String(foo);
+  } else {
+    return foo * 599;
+  }
+
+}
+
+const res1 = func('11'); // number
+const res2 = func(599, true); // string
+const res3 = func(599, false); // number
+
+
+
+async function asyncFun(): Promise<void>{}
+function* genFunc():Iterable<void>{}
+async function* asyncGenFunc():AsyncIterable<void>{}
+
+
+let foo1;
+
+// foo、bar 均为 any
+// function func1(foo, bar){}
+
+let unknownVar: unknown = "linbudu";
+
+
+const val1: string = unknownVar; // Error
+const val2: number = unknownVar; // Error
+const val3: () => {} = unknownVar; // Error
+const val4: {} = unknownVar; // Error
+
+
+const val5: any = unknownVar;
+const val6: unknown = unknownVar;
+
+
+let unknownVar1: unknown;
+
+unknownVar1.foo(); // 报错：对象类型为 unknown
+(unknownVar1 as {foo:()=>{}}).foo()//断言
+
+
+type UnionWithNever = "linbudu" | 599 | true | void | never;
+
+
+declare let v1: never;
+declare let v2: void;
+
+
+// v1 = v2; // X类型 void 不能赋值给类型 never
+
+v2 = v1;
+
+
+function justThrow(): never {
+  throw new Error()
+}
+
+function fooer (input:number){
+  if(input > 1){
+    justThrow();
+  }
+}

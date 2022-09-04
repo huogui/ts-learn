@@ -163,3 +163,162 @@ function fooer (input:number){
     justThrow();
   }
 }
+
+
+
+const arr = [];
+
+arr.push("linbudu"); // 类型“string”的参数不能赋给类型“never”的参数。
+
+let unknownStr: unknown;
+
+(unknownStr as { foo: () => {} }).foo();
+
+
+
+function respawn(union: string | number) {
+  if ((union as string).includes("linbudu")) { }
+
+  if ((union as number).toFixed() === '599') { }
+}
+
+
+
+interface IFoo {
+  name: string;
+}
+
+declare const obj1: {
+  foo1: IFoo
+}
+
+const {
+  foo1 = {} as IFoo
+} = obj1
+
+
+const str: string = "linbudu";
+
+// 从 X 类型 到 Y 类型的断言可能是错误的，
+(str as unknown as { handler: () => {} }).handler()
+
+
+
+
+declare const number: {
+  func?: () => ({
+    prop?: number | null;
+  })
+};
+
+number.func!().prop!.toFixed();
+
+
+const target = [1, 2, 3, 599].find(item => item === 599)!
+
+console.log(target)
+
+
+interface IStruct {
+  foo: string;
+  bar: {
+    barPropA: string;
+    barPropB: number;
+    barMethod: () => void;
+    baz: {
+      handler: () => Promise<void>;
+    };
+  };
+}
+
+
+const st = <IStruct>  {
+foo:'1'
+};
+
+
+
+type StatusCode = 200 | 301 | 400 | 500 | 502;
+type PossibleDataTypes = string | number | (() => unknown);
+
+const status: StatusCode = 502;
+
+type Factory<T> = T | number | string;
+
+
+type MaybeNull<T> = T | null;
+
+function process(input: MaybeNull<{ handler: () => {} }>) {
+  input?.handler();
+}
+
+
+type MaybeArray<T> = T | T[];
+
+// 函数泛型我们会在后面了解~
+function ensureArray<T>(input: MaybeArray<T>): T[] {
+  return Array.isArray(input) ? input : [input];
+}
+
+
+type StrAndNum = string & number; // never
+
+
+
+type Struct1 = {
+  primitiveProp: string;
+  objectProp: {
+    name: string;
+  }
+}
+
+type Struct2 = {
+  primitiveProp: number;
+  objectProp: {
+    age: number;
+  }
+}
+
+type Composed = Struct1 & Struct2;
+
+type PrimitivePropType = Composed['primitiveProp']; // never
+type ObjectPropType = Composed['objectProp']; // { name: string; age: number; }
+
+type UnionIntersection1 = (1 | 2 | 3) & (1 | 2); // 1 | 2
+type UnionIntersection2 = (string | number | symbol) & string; // string
+
+
+interface AllStringTypes {
+  [key: string]: string;
+}
+
+type PropType1 = AllStringTypes['linbudu']; // string
+type PropType2 = AllStringTypes['599']; // string
+
+
+const o: AllStringTypes = {
+  "linbudu": "599",
+  599: "linbudu",
+  [Symbol.for("ddd")]: 'symbol',
+}
+
+
+type okeys = keyof AllStringTypes
+
+
+type anys = keyof any
+
+
+
+type Stringify<T> = {
+  [K in keyof T]: T[K];
+};
+
+interface Foo1 {
+  prop1: string;
+  prop2: number;
+  prop3: boolean;
+  prop4: () => void;
+}
+
+type StringifiedFoo = Stringify<Foo1>;

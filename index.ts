@@ -836,3 +836,168 @@ type Result45 = number[] extends (number | string)[] ? 1 : 2; // 1
 type Result46 = any[] extends number[] ? 1 : 2; // 1
 type Result47 = unknown[] extends number[] ? 1 : 2; // 2
 type Result48 = never[] extends number[] ? 1 : 2; // 1
+
+
+type Num = Result48 extends 1?1:0
+
+type N1 = 0 extends 0?0:1
+
+type T = true extends true?'true':'false'
+
+
+// type LiteralType<T> = T extends string ? "string" : "other";
+
+// type L1 = LiteralType<'str'>
+// type L2 = LiteralType<false>
+
+
+
+
+export type LiteralType<T> = T extends string
+	? "string"
+	: T extends number
+	? "number"
+	: T extends boolean
+	? "boolean"
+	: T extends null
+	? "null"
+	: T extends undefined
+	? "undefined"
+	: never;
+
+type L1 = LiteralType<"linbudu">; // "string"
+type L2 = LiteralType<599>; // "number"
+type L3 = LiteralType<true>; // "boolean"
+type L4 = LiteralType<{}>; // "boolean"
+
+
+function universalAdd<T extends number | bigint | string>(x: T, y: T):LiteralToPrimitive<T> {
+  return x + (y as any);
+}
+
+
+
+type LiteralToPrimitive<T> = T extends number?number:T extends bigint?bigint:T extends string?string:never
+
+
+universalAdd("linbudu", "599"); // string
+universalAdd(599, 1); // number
+universalAdd(10n, 10n); // bigint
+
+//函数类型
+
+type Func = (...args: any[]) => any;
+
+type FunctionConditionType<T extends Func> = T extends (
+  ...args: any[]
+) => string
+  ? 'A string return func!'
+  : 'A non-string return func!';
+
+//  "A string return func!"
+type StringResult = FunctionConditionType<() => string>;
+// 'A non-string return func!';
+type NonStringResult1 = FunctionConditionType<() => boolean>;
+// 'A non-string return func!';
+type NonStringResult2 = FunctionConditionType<() => number>;
+
+
+
+
+type Fun = (...args:any[])=>any
+
+type FunctionalType<T extends Fun> = T extends (...args:any[])=>string?'A string return func!':'A non-string return func!'
+
+type StringResult3 = FunctionConditionType<() => string>;
+// 'A non-string return func!';
+type NonStringResult4 = FunctionConditionType<() => boolean>;
+// 'A non-string return func!';
+type NonStringResult5 = FunctionConditionType<() => number>;
+
+// 提取传入的类型信息   infer 关键字
+type FunctionalSplit<T extends Fun> = T extends (...args:any[])=>infer R?R:never
+
+type StringResult6 = FunctionalSplit<() => boolean>;
+
+
+type Swap<T extends any[]> = T extends [infer A,...infer B]?[...B,A]:T
+
+type SwapResult2 = Swap<[1, 2, 3]>; // 不符合结构，没有发生替换，仍是 [1, 2, 3]
+
+type SwapFL<T extends number[]> = T extends [infer start,...infer left,infer end]?[end,...left,start]:T
+
+
+type SFL = SwapFL<[1,2,3,4,5]>
+
+type ToTuple<N extends number, List extends any[] = []> = List['length'] extends N
+    ? List : ToTuple<N, [...List, any]>
+
+type Tuple9 = ToTuple<9>['length']
+
+type Sub<N1 extends number,N2 extends number> = ToTuple<N1> extends [...ToTuple<N2>,...infer Reset]?Reset['length']:-1
+
+type Sub1 = Sub<2,1>
+
+
+
+//数组
+
+type ArrayItemType<T> = T extends Array<infer ElementType> ? ElementType : never;
+
+type ArrayItemTypeResult1 = ArrayItemType<[]>; // never
+type ArrayItemTypeResult2 = ArrayItemType<string[]>; // string
+type ArrayItemTypeResult3 = ArrayItemType<[string, number]>; // string | number
+
+
+// 提取对象的属性类型
+type PropType<T,K extends keyof T> = T extends {[Key in K]:infer R}?R:never
+
+type PropTypeResult1 = PropType<{ name: string }, 'name'>; // string
+
+
+// 反转键名与键值
+type ReverseKeyVal<T extends Record<string,unknown>> = T extends Record<infer K,infer V>?Record<V & string,K>:never
+
+type Obj = ReverseKeyVal<{2:'str'}>
+
+// Promise
+
+
+// type PromiseValue<T> = T extends Promise<infer V> ? V : T;
+
+// type PromiseValue<T> = T extends Promise<infer V>
+//   ? V extends Promise<infer N>
+//     ? N
+//     : V
+//   : T;
+
+type PromiseValue<T> = T extends Promise<infer V> ? PromiseValue<V> : T;
+
+type PromiseValueResult1 = PromiseValue<Promise<number>>; // number
+
+type PromiseValueResult2 = PromiseValue<number>; // number，但并没有发生提取
+
+type PromiseValueResult3 = PromiseValue<Promise<Promise<boolean>>>; // Promise<boolean>，只提取了一层
+
+
+
+//分布式条件类型
+
+
+type Condition<T> = T extends 1 | 2 | 3 ? T : never;
+
+// 1 | 2 | 3
+type Res11 = Condition<1 | 2 | 3 | 4 | 5>;
+
+// never
+type Res22 = 1 | 2 | 3 | 4 | 5 extends 1 | 2 | 3 ? 1 | 2 | 3 | 4 | 5 : never;
+
+
+type Naked<T> = T extends boolean ? "Y" : "N";
+type Wrapped<T> = [T] extends [boolean] ? "Y" : "N";
+
+// "N" | "Y"
+type Res33 = Naked<number | boolean>;
+
+// "N"
+type Res44 = Wrapped<number | boolean>;

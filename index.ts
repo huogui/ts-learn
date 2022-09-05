@@ -2,7 +2,8 @@
  * tsc --init
  * ts-node index.ts
  * ts-node-dev --respawn --transpile-only index.ts
- *  
+ * source:https://juejin.cn/book/7086408430491172901/section/7100487863032086561
+ * 只做学习笔记使用
  * 
  * 
  * 
@@ -243,7 +244,7 @@ type PossibleDataTypes = string | number | (() => unknown);
 
 const status: StatusCode = 502;
 
-type Factory<T> = T | number | string;
+// type Factory<T> = T | number | string;
 
 
 type MaybeNull<T> = T | null;
@@ -322,3 +323,227 @@ interface Foo1 {
 }
 
 type StringifiedFoo = Stringify<Foo1>;
+
+
+
+
+//泛型开始
+
+
+
+// type Factory<T> = T | number | string;
+
+
+type Clone<T> = {
+  [K in keyof T]:T[K]
+}
+
+// type Partial<T> = {
+//   [K in keyof T]?:T[K]
+// }
+
+interface person  {
+  name:string,
+  age:number
+}
+
+type Strify<T> = {
+  [K in keyof T]:string
+}
+
+type CloneP = Clone<person>
+type ClonePp = Partial<person>
+type StringP = Strify<person>
+
+type PartialPerson = Partial<person>
+
+//映射类型、索引类型、
+//条件类型开始
+type IsEqual<T> = T extends true? 1 : 2 //extends 
+
+type A = IsEqual<true>; // 1
+type B = IsEqual<false>; // 2
+type C = IsEqual<'linbudu'>; // 2
+
+
+//类型约束和默认值
+//默认值
+type Factory<T = boolean> = T | number | string;
+
+const Fa: Factory = false;
+
+//泛型约束
+/**
+ * 而在泛型中，我们可以使用 extends 关键字来约束传入的泛型参数必须符合要求。关于 extends，A extends B 意味着 A 是 B 的子类型，
+ * 这里我们暂时只需要了解非常简单的判断逻辑，也就是说 A 比 B 的类型更精确，或者说更复杂。具体来说，可以分为以下几类。
+ * 
+*/
+
+// type ResStatus<ResCode extends number = 10000> = ResCode extends 10000 | 10001 | 10002
+//   ? 'success'
+//   : 'failure';
+
+type ResStatus<ResCode extends number = 10000> = ResCode extends 10000 | 10001 | 10002?'success':'failure' 
+
+
+type Res1 = ResStatus<10000>; // "success"
+type Res2 = ResStatus<20000>; // "failure"
+
+type Res3 = ResStatus<'10000'>; // 类型“string”不满足约束“number”。
+
+type Res4 = ResStatus; // "success"
+
+
+//多泛型关联
+/**
+ * 我们不仅可以同时传入多个泛型参数，还可以让这几个泛型参数之间也存在联系。我们可以先看一个简单的场景，条件类型下的多泛型参数：
+ * 
+*/
+
+
+type Conditional<Type, Condition, TruthyResult, FalsyResult> =
+  Type extends Condition ? TruthyResult : FalsyResult;
+
+//  "passed!"
+type Result1 = Conditional<'linbudu', string, 'passed!', 'rejected!'>;
+
+// "rejected!"
+type Result2 = Conditional<'linbudu', boolean, 'passed!', 'rejected!'>;
+
+
+type ProcessInput<
+  Input,
+  SecondInput extends Input = Input,
+  ThirdInput extends Input = SecondInput
+> = number;
+
+//对象类型中的泛型
+interface IRes<TData = unknown> {
+  code: number;
+  error?: string;
+  data: TData;
+}
+
+
+interface IUserProfileRes {
+  name: string;
+  homepage: string;
+  avatar: string;
+}
+
+function fetchUserProfile(): Promise<IRes<IUserProfileRes>> {
+  return Promise.resolve({
+    code:200,
+  data:{
+    name:"ceshi",
+    homepage:"1",
+    avatar:'1'
+  }
+  })
+}
+
+type StatusSucceed = boolean;
+function handleOperation(): Promise<IRes<StatusSucceed>> {
+  return Promise.resolve({
+    code:200,
+    data:false
+  })
+}
+
+
+//分页场景
+
+interface IPaginationRes<IData = unknown>  {
+  data:IData,
+  page:number,
+  totalPage:number,
+  hasNextPage:boolean
+}
+
+
+function fetchUserProfileList():Promise<IRes<IPaginationRes<IUserProfileRes>>>{
+  return Promise.resolve({
+    code:200,
+    data:{
+      data:{
+        name:'name',
+        homepage:"1",
+        avatar:'1'
+      },
+      page:1,
+      totalPage:20,
+      hasNextPage:true
+    }
+  })
+}
+
+
+//类型的自动提取。
+
+// function handle(input: string | number | {}): string | number | {} {}
+
+
+// const shouldBeString = handle("linbudu");
+// const shouldBeNumber = handle(599);
+// const shouldBeObject = handle({ name: "linbudu" });
+function handle<T extends string | number>(input: T): T {
+  return input
+}
+
+const author = "linbudu"; // 使用 const 声明，被推导为 "linbudu"
+
+let authorAge = 18; // 使用 let 声明，被推导为 number
+
+handle(author); // 填充为字面量类型 "linbudu"
+handle(authorAge); // 填充为基础类型 number
+
+function swap<T extends number, U extends number>([start,end]:[T,U]):[U,T]{
+  return [end,start]
+}
+
+
+const swapped1 = swap([23, 599]);
+const swapped2 = swap([20, 599]);
+
+
+/***
+ * 
+ * 比如 lodash 的 pick 函数，这个函数首先接受一个对象，然后接受一个对象属性名组成的数组，并从这个对象中截取选择的属性部分：
+ * 
+ * _.pick(object, ['a', 'c']);
+ * => { 'a': 1, 'c': 3 }
+*/
+function handle1<T>(payload: T): Promise<[T]> {
+  return new Promise<[T]>((res, rej) => {
+    res([payload]);
+  });
+}
+
+
+const handle2 = <T extends any>(input: T): T => {
+  return input
+}
+
+
+//内置方法中的泛型
+
+interface PromiseConstructor {
+  resolve<T>(value: T | PromiseLike<T>): Promise<T>;
+}
+
+declare var Promise: PromiseConstructor;
+
+
+
+// 第一种 reduce
+arr.reduce((prev, curr, idx, arr) => {
+  return prev;
+}, 1);
+
+// 第二种 reduce
+// 报错：不能将 number 类型的值赋值给 never 类型
+arr.reduce<number[]>((prev, curr, idx, arr) => {
+  return prev
+}, []);
+
+

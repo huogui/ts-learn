@@ -546,4 +546,119 @@ arr.reduce<number[]>((prev, curr, idx, arr) => {
   return prev
 }, []);
 
+//结构化类型系统
+
+
+class Cat {
+  // meow() { }
+  eat(): number {
+    return 123
+  }
+}
+
+class Dog {
+  eat(): number {
+    return 599;
+  }
+}
+
+function feedCat(cat: Cat) { }
+
+feedCat(new Dog())   //居然可以......
+
+// Duck Test -> Duck Typing 其核心理念是，如果你看到一只鸟走起来像鸭子，游泳像鸭子，叫得也像鸭子，那么这只鸟就是鸭子。===> Cat === Dog
+
+
+
+// type USD = number;
+// type CNY = number;
+
+// const CNYCount: CNY = 200;
+// const USDCount: USD = 200;
+
+// function addCNY(source: CNY, input: CNY) {
+//   return source + input;
+// }
+
+// addCNY(CNYCount, USDCount)
+
+
+//标称类型系统
+//在 TypeScript 中模拟标称类型系统
+
+
+
+// export declare class TagProtector<T extends string> {
+//   protected __tag__: T;
+// }
+
+// export type Nominal<T, U extends string> = T & TagProtector<U>;
+
+
+export declare class TagProtector<T extends string>{
+  protected __tag__:T
+}
+
+export type Nominal<T,U extends string> = T & TagProtector<U>
+
+
+/****
+ * 
+ * 在这里我们使用 TagProtector 声明了一个具有 protected 属性的类，使用它来携带额外的信息，并和原本的类型合并到一起，就得到了 Nominal 工具类型。
+ * 
+ * *******/
+
+// type CNY = Nominal<number,'CNY'>
+// type USD = Nominal<number,'USD'>
+
+// const CNYCount = 200 as CNY;
+// const USDCount = 200 as USD;
+
+
+// function addCNY(source: CNY, input: CNY) {
+//   return (source + input) as CNY;
+// }
+
+
+// addCNY(CNYCount, CNYCount);
+
+// // 报错了！
+// addCNY(CNYCount, USDCount);
+
+
+class CNY {
+  private __tag!: void;
+  constructor(public value: number) {}
+}
+class USD {
+  private __tag!: void;
+  constructor(public value: number) {}
+}
+
+const CNYCount = new CNY(100);
+const USDCount = new USD(100);
+
+function addCNY(source: CNY, input: CNY) {
+  return (source.value + input.value);
+}
+
+addCNY(CNYCount, CNYCount);
+// 报错了！
+addCNY(CNYCount, USDCount);
+
+
+//Opaque Type 
+declare const tag: unique symbol;
+
+declare type Tagged<Token> = {
+    readonly [tag]: Token;
+};
+
+export type Opaque<Type, Token = unknown> = Type & Tagged<Token>;
+
+
+// 在 TypeScript 中我们可以通过类型或者逻辑的方式来模拟标称类型，这两种方式其实并没有非常明显的优劣之分，基于类型实现更加轻量，
+// 你的代码逻辑不会受到影响，但难以进行额外的逻辑检查工作。而使用逻辑实现稍显繁琐，但你能够进行更进一步或更细致的约束。
+
+
 

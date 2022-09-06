@@ -1031,6 +1031,82 @@ type Mutable<T> = {-readonly [P in keyof T]:T[P]}
 
 type Pm = Mutable<Pr>
 
+export type NoDistribute<T> = T & {};
+
+type Wrapped1<T> = NoDistribute<T> extends [boolean] ? "Y" : "N";
+
+type CompareUnion<T, U> = [T] extends [U] ? true : false;
+
+type CompareRes1 = CompareUnion<1 | 2, 1 | 2 | 3>; // true
+type CompareRes2 = CompareUnion<1 | 2, 1>; // false
+
+
+type IsNever<T> = [T] extends [never] ? true : false;
+
+type IsNeverRes1 = IsNever<never>; // true
+type IsNeverRes2 = IsNever<"linbudu">; // false
+
+
+// 直接使用，返回联合类型
+type Tmp1 = any extends string ? 1 : 2;  // 1 | 2
+
+type Tmp2<T> = T extends string ? 1 : 2;
+// 通过泛型参数传入，同样返回联合类型
+type Tmp2Res = Tmp2<any>; // 1 | 2
+
+// 如果判断条件是 any，那么仍然会进行判断
+type Special1 = any extends any ? 1 : 2; // 1
+type Special2<T> = T extends any ? 1 : 2;
+type Special2Res = Special2<any>; // 1
+
+
+
+
+
+
+
+
+
+
+// 直接使用，仍然会进行判断
+type Tmp3 = never extends string ? 1 : 2; // 1
+
+type Tmp4<T> = T extends string ? 1 : 2;
+// 通过泛型参数传入，会跳过判断
+type Tmp4Res = Tmp4<never>; // never
+
+// 如果判断条件是 never，还是仅在作为泛型参数时才跳过判断
+type Special3 = never extends never ? 1 : 2; // 1
+type Special4<T> = T extends never ? 1 : 2;
+type Special4Res = Special4<never>; // never
+
+type Interselection<A,B> = A extends B?A:never;
+
+type It = Interselection<1|2|3,2|3|4>
+
+
+type IsAny<T> = 0 extends 1 & T ? true : false;
+
+type Any1 = IsAny<false>
+
+
+
+type IsUnknown<T> = IsNever<T> extends false
+  ? T extends unknown
+    ? unknown extends T
+      ? IsAny<T> extends false
+        ? true
+        : false
+      : false
+    : false
+  : false;
+
+
+type IsUnknownPlus<T> = unknown extends T?IsAny<T> extends true?false:true:false
+
+
+
+
 
 type RecordMy<K extends keyof any,V>={[P in K]:V}
 
@@ -1068,3 +1144,4 @@ type MyOmit<T,K extends keyof any> = MyPick<T, MyExclude<keyof T,K>>
 
 
 type B2 = MyOmit<Foo1,'name'>
+

@@ -1001,3 +1001,70 @@ type Res33 = Naked<number | boolean>;
 
 // "N"
 type Res44 = Wrapped<number | boolean>;
+
+//妖魔化工具类型
+
+
+//工具类型的分类
+
+
+interface person{
+  name:string,
+  age:number
+}
+
+type PartialMy<T> = {[P in keyof T]?:T[P]}
+
+type P = PartialMy<person>
+
+type RequiredMy<T> = {[P in keyof T]-?:T[P]}
+
+type Ps = RequiredMy<P>
+
+
+type ReadonlyMy<T> = { readonly [P in keyof T]:T[P]}
+
+type Pr = ReadonlyMy<Ps>
+
+
+type Mutable<T> = {-readonly [P in keyof T]:T[P]}
+
+type Pm = Mutable<Pr>
+
+
+type RecordMy<K extends keyof any,V>={[P in K]:V}
+
+interface Foo1 {
+  name: string;
+  age: number;
+  sex:string;
+}
+interface Foo2 {
+  name: string;
+  age: number;
+}
+
+
+
+type MyPick<T,K extends keyof T> = {
+  [P in K]:T[P]
+}
+
+
+
+type PickedFoo = MyPick<Foo, "name" | "age">
+
+
+type C1 = number
+type C2 = never
+
+type MyExclude<T,U> = T extends U?never:T
+type MyExtrack<T,U> = T extends U?T:never
+
+type C3 = MyExtrack<C1,C2>
+
+
+type MyOmit<T,K extends keyof any> = MyPick<T, MyExclude<keyof T,K>>
+
+
+type B2 = MyOmit<Foo1,'name'>

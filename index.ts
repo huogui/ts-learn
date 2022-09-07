@@ -10,7 +10,7 @@
 
 */
 
-function sum(n1:number,n2:number):number{
+func22tion sum(n1:number,n2:number):number{
     return n1 + n2
 }
 
@@ -61,19 +61,19 @@ interface IDescription {
     name: string;
     age: number;
     male?: boolean;
-    func?: Function;
+    func22?: Func22tion;
   }
 
   const obj2: IDescription = {
     name: 'linbudu',
     age: 599,
     male: true,
-    func:()=>{}
-    // 无需实现 func 也是合法的
+    func22:()=>{}
+    // 无需实现 func22 也是合法的
   };
 
  obj2.male = false;
-// obj2.func()
+// obj2.func22()
  
 
 const obj:Record<string,unknown> = {false:2}
@@ -86,7 +86,7 @@ const uniqueSymbolFoo:  symbol = Symbol("linbudu")
 const uniqueSymbolBar:  symbol = uniqueSymbolFoo
 
 
-function test(a:string):string | void{
+func22tion test(a:string):string | void{
     return a
 }
 
@@ -556,15 +556,15 @@ class Cat {
   }
 }
 
-class Dog {
-  eat(): number {
-    return 599;
-  }
-}
+// class Dog {
+//   eat(): number {
+//     return 599;
+//   }
+// }
 
 function feedCat(cat: Cat) { }
 
-feedCat(new Dog())   //居然可以......
+// feedCat(new Dog())   //居然可以......
 
 // Duck Test -> Duck Typing 其核心理念是，如果你看到一只鸟走起来像鸭子，游泳像鸭子，叫得也像鸭子，那么这只鸟就是鸭子。===> Cat === Dog
 
@@ -1220,3 +1220,71 @@ type CT = abstract new (arg:number)=>string
 
 type CTP = ConstructorParameters<CT>
 type CTR = InstanceType<CT>
+
+
+//上下文类型
+
+window.onerror = (event, source, line, col, err) => {};
+
+
+
+
+
+func22 = (raw) => {
+  // input → string
+  return (input) => {};
+};//上下文类型推导 ，听说我谢谢你温暖了四季！！！！
+
+
+// void 返回值类型下的特殊情况
+
+// 逆变与协变
+
+class Animal {
+  asPet() {}
+}
+
+class Dog extends Animal {
+  bark() {}
+}
+
+class Corgi extends Dog {
+  cute() {}
+}
+
+type DogFactory = (args: Dog) => Dog;
+
+
+function transformDogAndBark(dogFactory: DogFactory) {
+  const dog = dogFactory(new Dog());
+  dog.bark();
+}
+
+function makeDogBark(dog: Dog) {
+  dog.bark();
+}
+
+// 没问题
+makeDogBark(new Corgi());
+// 不行
+makeDogBark(new Animal());
+
+
+
+type AsFunArgType<T> = (arg:T)=> void
+
+type AsFunReturnType<T> = (arg:unknown)=>T
+
+
+// 1 成立：(T -> Corgi) ≼ (T -> Dog)
+type CheckReturnType = AsFunReturnType<Dog> extends AsFunReturnType<Corgi>
+  ? 1
+  : 2;
+
+
+// 2 不成立：(Dog -> T) ≼ (Animal -> T)
+
+type CheckArgType = AsFunArgType<Animal> extends AsFunArgType<Dog> ? 1 : 2;
+
+
+//进行一个总结：函数类型的参数类型使用子类型逆变的方式确定是否成立，而返回值类型使用子类型协变的方式确定。

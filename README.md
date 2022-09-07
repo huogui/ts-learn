@@ -58,3 +58,9 @@
 
     type CTP = ConstructorParameters<CT>
     type CTR = InstanceType<CT>
+
+
+# 上下文类型
+  **void 返回值类型下的特殊情况：void并不会真的不返回类型**
+# 协变和逆变
+

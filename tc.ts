@@ -68,3 +68,29 @@ type DeepReadonly<T extends object> = {
   readonly [K in keyof T]:T[K] extends object?DeepReadonly<T[K]>:T[K]
 }
  
+
+type DeepReadonlyStruct = DeepReadonly<{
+  foo: string;
+  nested: {
+    nestedFoo: string;
+    nestedBar: {
+      nestedBarFoo: string;
+    };
+  };
+}>;
+expectType<DeepReadonlyStruct>({
+  foo:'foo',
+  nested: {
+    nestedFoo: 'test',
+    nestedBar: {
+      nestedBarFoo: 'test',
+    },
+  },
+});
+
+type DeepMutable<T extends object> = {
+  - readonly [K in keyof T]:T[K] extends object?DeepMutable<T[K]>:T[K]
+}
+
+
+type DM = DeepMutable<DeepReadonlyStruct>

@@ -1027,7 +1027,7 @@ type ReadonlyMy<T> = { readonly [P in keyof T]:T[P]}
 type Pr = ReadonlyMy<Ps>
 
 
-type Mutable<T> = {-readonly [P in keyof T]:T[P]}
+// type Mutable<T> = {-readonly [P in keyof T]:T[P]}
 
 type Pm = Mutable<Pr>
 
@@ -1145,3 +1145,78 @@ type MyOmit<T,K extends keyof any> = MyPick<T, MyExclude<keyof T,K>>
 
 type B2 = MyOmit<Foo1,'name'>
 
+
+//复习
+
+type Record<K extends keyof any,V> = {
+  [P in K]:V
+}
+
+
+type obj88 = {
+  name:string,
+  age:number
+}
+
+
+type Partial<T> = {[P in keyof  T]?:T[P]}
+
+type Required<T> = {[P in keyof T]-?:T[P]}
+
+type Readonly<T> = {readonly [P in keyof T]:T[P]}
+
+type Mutable<T> = {-readonly [P in keyof T]:T[P]}
+
+
+type Pick<T,U extends keyof T> = {
+  [P in U]:T[P]
+}
+
+type Exclude<T,U> = T extends U?never:T //差集
+type Extrack<T,U> = T extends U?T:never//交集
+
+
+type Omit<T,K extends keyof T> = Pick<T,Exclude<keyof T,K>>
+
+type PK = Pick<obj88,'name'>
+type OT = Omit<obj88,'name'>
+
+
+// type FunType = (...args:any)=>any
+
+//取返回值部分
+
+type FirstParameter<T extends FunType> = T extends (arg:infer P,...args:any)=>any?P:never
+
+type FuncFoo = (arg: number) => string;
+type FuncBar = (...args: string[]) => void;
+
+
+
+// type ReturnType<T extends FunType> = T extends (...args:any)=>infer R?R:never
+
+
+
+type FunType = (...args:any)=>any
+
+
+type ReturnType<T extends FunType> = T extends (...args:any)=>infer R?R:never
+
+type FirstType<T extends FunType> = T extends (arg:infer P,...args:any)=>any?P:never
+
+
+type FooFirstParameter = FirstType<FuncFoo>; // number
+type FuncBarFirstParams = ReturnType<FuncFoo>; // string
+
+
+type ClassType = abstract new (...args:any)=>any;
+
+type ConstructorParameters<T extends ClassType> = T extends abstract new (...args:infer P)=>any?P:never
+
+type InstanceType<T extends ClassType> = T extends abstract new (...args:any)=>infer R?R:never
+
+
+type CT = abstract new (arg:number)=>string
+
+type CTP = ConstructorParameters<CT>
+type CTR = InstanceType<CT>

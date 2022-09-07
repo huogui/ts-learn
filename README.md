@@ -38,3 +38,23 @@
     type MyExtrack<T,U> = T extends U?T:never
 
     type MyOmit<T,K extends keyof any> = MyPick<T, MyExclude<keyof T,K>>
+
+    type FunType = (...args:any)=>any
+
+
+    type ReturnType<T extends FunType> = T extends (...args:any)=>infer R?R:never
+
+    type FirstType<T extends FunType> = T extends (arg:infer P,...args:any)=>any?P:never
+    
+
+    type ClassType = abstract new (...args:any)=>any;
+
+    type ConstructorParameters<T extends ClassType> = T extends abstract new (...args:infer P)=>any?P:never
+
+    type InstanceType<T extends ClassType> = T extends abstract new (...args:any)=>infer R?R:never
+
+
+    type CT = abstract new (arg:number)=>string
+
+    type CTP = ConstructorParameters<CT>
+    type CTR = InstanceType<CT>

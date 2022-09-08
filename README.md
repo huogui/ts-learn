@@ -90,3 +90,27 @@
     type MarkPropsAsMutable<T extends object,K extends keyof T = keyof T> = Flatten<DeepMutable<Pick<T,K>> & Omit<T,K>>
 
     type MarkPropsAsNullable<T extends object,K extends keyof T = keyof T> = Flatten<DeepNullable<Pick<T,K>> & Omit<T,K>>
+# 结构工具类型进阶
+
+    type FuncStruct = (...args: any[]) => any;
+
+    type ExpectPropKeys<T extends object,ValueType> = {[K in keyof T]-? : T[K] extends ValueType ? K : never}[keyof T]
+
+    type FunctionKeys<T extends object> = ExpectPropKeys<T,FuncStruct>
+
+    type PickByValueType<T extends object,ValueType> = Pick<T,ExpectPropKeys<T,ValueType>>
+
+    type FilterPropsKeys<T extends object,ValueType> = {[K in keyof T]-? : T[K] extends ValueType ? never : K}[keyof T]
+
+    type OmitByValueType<T extends Record<string,any>,ValueType> = Pick<T,FilterPropsKeys<T,ValueType>>
+
+    **这个好复杂**
+    type StrictConditional<K,ValueType,Resolved,Rejected,Failed = never> = [K] extends [ValueType] ? [ValueType] extends [K] ? Resolved : Rejected : Failed 
+    **//Positive 默认是Pick**
+    type StrictValueTypeFilter<T,ValueType,Positive extends boolean = true> = {
+        [K in keyof T] : StrictConditional<T[K],ValueType,Positive extends true ? K :never,Positive extends true ? never : K,Positive extends true ? never : K>
+    }[keyof T]
+
+    type OmitByValueType<T extends object,ValueType> = Pick<T,StrictValueTypeFilter<T,ValueType,false>>
+    type PickByValueType<T extends object,ValueType> = Pick<T,StrictValueTypeFilter<T,ValueType,true>>
+

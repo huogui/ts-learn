@@ -172,3 +172,183 @@ type MarkPropsAsNonNullable<
   T extends object,
   K extends keyof T = keyof T
 > = Flatten<Omit<T, K> & DeepNonNullbale<Pick<T, K>>>;
+
+
+
+//结构类型进阶
+
+
+type FuncStruct = (...args: any[]) => any;
+
+// type FunctionKeys<T extends object> = {
+//   [K in keyof T] : T[K] extends FuncStruct ? K : never
+// }[keyof T]
+
+
+// type FunStruct = {
+//   a:()=>void,
+//   b:()=>void,
+//   c:()=>void,
+//   d:string
+// }
+
+// type FunKeys = FunctionKeys<FunStruct>
+
+
+type ExpectPropKeys<T extends object,ValueType> = {
+  [K in keyof T]-? : T[K] extends ValueType ? K : never
+}[keyof T]
+
+
+type FunctionKeys<T extends object> = ExpectPropKeys<T,FuncStruct>
+
+
+expectType<
+  FunctionKeys<{
+    foo: () => void;
+    bar: () => number;
+    baz: number;
+  }>
+>('foo');
+
+expectType<
+  FunctionKeys<{
+    foo: () => void;
+    bar: () => number;
+    baz: number;
+  }>
+  // 报错，因为 baz 不是函数类型属性
+>('baz');
+
+
+// type PickByValueType<T extends object,ValueType> = Pick<T,ExpectPropKeys<T,ValueType>>
+
+
+expectType<PickByValueType<{ foo: string; bar: number }, string>>({
+  foo: 'linbudu111',
+});
+
+
+type FilterPropsKeys<T extends object,ValueType> = {
+  [K in keyof T]-? : T[K] extends ValueType ? never : K
+}[keyof T]
+
+// type OmitByValueType<T extends Record<string,any>,ValueType> = Pick<T,FilterPropsKeys<T,ValueType>>
+
+
+expectType<OmitByValueType<{ foo: string; bar: number }, string>>({
+  bar: 1,
+});
+
+
+
+// type Conditional<Value, Condition, Resolved, Rejected> = Value extends Condition
+//   ? Resolved
+//   : Rejected;
+
+//  type ValueTypeFilter<
+//   T extends object,
+//   ValueType,
+//   Positive extends boolean
+// > = {
+//   [Key in keyof T]-?: T[Key] extends ValueType
+//     ? Conditional<Positive, true, Key, never>
+//     : Conditional<Positive, true, never, Key>;
+// }[keyof T];
+
+//  type PickByValueType<T extends object, ValueType> = Pick<
+//   T,
+//   ValueTypeFilter<T, ValueType, true>
+// >;
+
+//  type OmitByValueType<T extends object, ValueType> = Pick<
+//   T,
+//   ValueTypeFilter<T, ValueType, false>
+
+
+// >;
+
+// type Condition<Value,Condition,resolved,rejected,Failed = never> = [Value] extends [Condition] ? [Condition] extends [Value] ? resolved : rejected : Failed
+
+
+
+// type ValueTypeFilter<T extends object,ValueType,Positive extends boolean> = {
+//   [K in keyof T]-?:T[K] extends ValueType ? StrictConditional<Positive,true,K,never> : StrictConditional<Positive,true,never,K>
+// }[keyof T]
+
+// type PickByValueType<T extends object,ValueType> = Pick<T,ValueTypeFilter<T,ValueType,true>>
+// type OmitByValueType<T extends object,ValueType> = Pick<T,ValueTypeFilter<T,ValueType,false>>
+
+
+// expectType<PickByValueType<{ foo: string; bar: number }, string>>({
+//   foo: 'linbudu111',
+// });
+
+// expectType<OmitByValueType<{ foo: string; bar: number }, string>>({
+// });
+
+
+
+type StrictConditional<K,ValueType,Resolved,Rejected,Failed = never> = [K] extends [ValueType] ? [ValueType] extends [K] ? Resolved : Rejected : Failed 
+//Positive 默认是Pick 
+type StrictValueTypeFilter<T,ValueType,Positive extends boolean = true> = {
+  [K in keyof T] : StrictConditional<T[K],ValueType,Positive extends true ? K :never,Positive extends true ? never : K,Positive extends true ? never : K>
+}[keyof T]
+
+type FilterStruct = {
+  name:string,
+  age:number
+}
+
+
+
+
+type OmitByValueType<T extends object,ValueType> = Pick<T,StrictValueTypeFilter<T,ValueType,false>>
+type PickByValueType<T extends object,ValueType> = Pick<T,StrictValueTypeFilter<T,ValueType,true>>
+
+
+type Test1 = OmitByValueType<FilterStruct,number>
+type Test2 = PickByValueType<FilterStruct,number>
+
+
+interface VIP {
+  vipExpires: number;
+}
+
+interface CommonUser {
+  promotionUsed: boolean;
+}
+
+type User = VIP | CommonUser;
+
+const user1: User = {
+  vipExpires: 599,
+  promotionUsed: false,
+};
+
+type T1 = {
+  name:string,
+  age:number
+}
+
+type U2 = {
+  name:string,
+  sex:string
+}
+
+
+
+ type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+
+
+type Test = Flatten<Without<T1,U2> & U2>
+type Test3 = Flatten<Without<U2,T1> & T1>
+
+
+
+
+export type XOR<T, U> = (Without<T, U> & U) | (Without<U, T> & T);
+
+type XORUser = XOR<VIP, CommonUser>;
+
+

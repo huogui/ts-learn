@@ -64,3 +64,29 @@
   **void 返回值类型下的特殊情况：void并不会真的不返回类型**
 # 协变和逆变
 
+# tc 
+    type NoNullable<T> = T extends null | undefined ? never : T
+    type DeepNoNullable<T extends object> = {
+        [K in keyof T]:T[K] extends object ? DeepNoNullable<T[K]> : NoNullable<T[K]>
+    }
+
+    type Flatten<T> = { [K in keyof T]: T[K] };
+    type MarkPropsAsOptional<T extends object,K extends keyof T = keyof T> = Flatten<Partial<Pick<T,K>> & Omit<T,K>>
+
+    type DeepMarkPropsAsOptional< T extends object,K extends keyof T = keyof T> = Flatten<DeepPartial<Pick<T,K>> & Omit<T,K>>
+
+    type Nullable<T> = T | null
+
+    type DeepNullable<T extends object> = {
+    [K in keyof T]:T[K] extends object?DeepNullable<T[K]>:Nullable<T[K]>
+    }
+
+
+    type MarkPropsAsRequired<T extends object,K extends keyof T = keyof T> = Flatten<DeepRequired<Pick<T,K>> & Omit<T,K>>
+
+
+    type MarkPropsAsReadonly<T extends object,K extends keyof T = keyof T> = Flatten<DeepReadonly<Pick<T,K>> & Omit<T,K>>
+
+    type MarkPropsAsMutable<T extends object,K extends keyof T = keyof T> = Flatten<DeepMutable<Pick<T,K>> & Omit<T,K>>
+
+    type MarkPropsAsNullable<T extends object,K extends keyof T = keyof T> = Flatten<DeepNullable<Pick<T,K>> & Omit<T,K>>

@@ -319,36 +319,43 @@ interface CommonUser {
   promotionUsed: boolean;
 }
 
-type User = VIP | CommonUser;
 
-const user1: User = {
-  vipExpires: 599,
+
+type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+
+
+type Tmp1 = Flatten<Without<VIP, CommonUser>>;
+type Tmp0 = Flatten<Without<CommonUser, VIP>>;
+
+
+type Tmp2 = Flatten<Tmp1 & CommonUser>;
+type Tmp3 = Flatten<Tmp0 & VIP>;
+
+type XORUser = Tmp2 | Tmp3
+
+
+
+expectType<XORUser>({
+  vipExpires: 0,
+});
+
+expectType<XORUser>({
   promotionUsed: false,
-};
-
-type T1 = {
-  name:string,
-  age:number
-}
-
-type U2 = {
-  name:string,
-  sex:string
-}
+});
 
 
+//集合工具类型进阶
 
- type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
+type Concurrence<T,U> = T | U
 
+type InterSection<T,U> = T extends U ? T : never
 
-type Test = Flatten<Without<T1,U2> & U2>
-type Test3 = Flatten<Without<U2,T1> & T1>
+type Difference<A,B> = A extends B ? never : A
+
+type Complement<A,B extends A> = Difference<A,B>
 
 
 
 
-export type XOR<T, U> = (Without<T, U> & U) | (Without<U, T> & T);
-
-type XORUser = XOR<VIP, CommonUser>;
 
 

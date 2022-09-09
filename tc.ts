@@ -356,6 +356,45 @@ type Complement<A,B extends A> = Difference<A,B>
 
 
 
+type PlainObjectType = Record<string,any>
+
+//并集
+type ObjectKeysConcurrence<T extends PlainObjectType,U extends PlainObjectType> = keyof T | keyof U;
 
 
+type OC = ObjectKeysConcurrence<{'a':number},{'a':number,'b':number}>
 
+
+//属性名交集
+
+type ObjectKeysIntersection<T extends PlainObjectType,U extends PlainObjectType> = InterSection<keyof T,keyof U>
+
+//属性名差集
+
+type ObjectKeysDifference<T extends PlainObjectType,U extends PlainObjectType> = Difference<keyof T,keyof U>
+
+type OKD = ObjectKeysDifference<{'a':number,'b':number},{'a':number}>
+
+//属性名补集
+
+type ObjectKeysComplement<T extends U,U extends PlainObjectType> = Complement<keyof T,keyof U>
+
+
+//对象
+
+//交集 Intersection 交接点 交叉点
+type ObjectIntersection<T extends PlainObjectType,U extends PlainObjectType> = Pick<T,ObjectKeysIntersection<T,U>>
+
+
+type OI = ObjectIntersection<{'a':number,'b':number},{'a':number}>
+
+
+//Difference 区别 差异
+type ObjectDifference<T extends PlainObjectType,U extends PlainObjectType> = Pick<T,ObjectKeysDifference<T,U>>
+
+type OD = ObjectDifference<{'a':number,'b':number},{'a':number}>
+
+
+//Complement 补充
+
+type ObjectComplement<T extends U,U extends PlainObjectType>

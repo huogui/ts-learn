@@ -114,3 +114,13 @@
     type OmitByValueType<T extends object,ValueType> = Pick<T,StrictValueTypeFilter<T,ValueType,false>>
     type PickByValueType<T extends object,ValueType> = Pick<T,StrictValueTypeFilter<T,ValueType,true>>
 
+# 模板字符串类型
+  - 基础使用
+  - 模板字符串类型的类型表现
+  - 结合索引类型与映射类型
+  - 专用工具类型
+  - 模板字符串类型与模式匹配
+  - 基于重映射的 PickByValueType
+
+
+

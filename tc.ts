@@ -443,3 +443,141 @@ type TR = OptionalKeys<{
   name?:string,
   age:number
 }>
+
+//模板字符串
+
+type Greet<T extends string | number | boolean | null | undefined | bigint> = `Hello ${T}`;
+
+type Greet1 = Greet<"linbudu">; // "Hello linbudu"
+type Greet2 = Greet<599>; // "Hello 599"
+type Greet3 = Greet<true>; // "Hello true"
+type Greet4 = Greet<null>; // "Hello null"
+type Greet5 = Greet<undefined>; // "Hello undefined"
+type Greet6 = Greet<0x1ffffffffffffffffffff>; // "Hello 9007199254740991"
+
+
+type GreetString = `Hello ${number}`
+
+let a:GreetString = 'Hello 9'
+
+type Version =  `${number}.${number}.${number}`
+
+let version:Version = '1.2.1'
+
+
+type Brand = 'iphone' | 'xiaomi' | 'honor';
+type Memory = '16G' | '64G';
+type ItemType = 'official' | 'second-hand';
+
+type SKU = `${Brand}-${Memory}-${ItemType}`;
+
+
+type SizeRecord<T extends string> = `${T}-Record`
+
+type Size = 'Small' | 'Middle' | 'Large'
+
+type UnionSizeRecord = SizeRecord<Size>
+
+
+declare let v1: `${number}.${number}.${number}`;
+declare let v2: '1.2.4';
+
+v1 = v2;
+
+
+//结合索引类型与映射类型
+
+
+interface Foo {
+  name: string;
+  age: number;
+  job: symbol;
+}
+
+// 提示并约束为 "nameChanged" | "ageChanged" | "jobChanged"
+listener.on('ageChanged');
+
+type DeepCopy<T extends Object> = {
+  [K in keyof T]? : T[K] extends object ? DeepCopy<T[K]> : T[K]
+}
+
+
+type obj = {
+  name:1,
+  test:{
+    a:1
+  }
+}
+
+type DC = DeepCopy<obj>
+
+expectType<DC>(
+  {
+   name:1,
+   test:{
+    a:1
+   }
+  }
+)
+
+
+interface Foo222 {
+  name: string;
+  age: number;
+}
+
+type CopyWithRename<T extends Record<keyof any,any>> = {
+  [K in keyof T as `modified_${string & K}`] : T[K] extends object ? DeepCopy<T[K]> : T[K]
+}
+
+type CF = CopyWithRename<Foo222>
+
+
+type Heavy<T extends string> = `${Uppercase<T>}`
+type Respect<T extends string> = `${Capitalize<T>}`;
+
+
+type US = Heavy<'string'>
+
+type USP = Lowercase<US>
+
+
+type UR = Respect<'string'>
+
+type URP = Uncapitalize<'String'>
+
+
+
+type CopyWithRenameWithCap<T extends Record<keyof any,any>> = {
+  [K in keyof T as `modified_${string & K}`] : T[K] extends object ? DeepCopy<T[K]> : T[K]
+}
+
+type CFC = CopyWithRenameWithCap<Foo222>
+
+
+//模板字符串类型与模式匹配
+
+
+type ReverseName<T extends string> = T extends `${infer First} ${infer Last}` ? `${Capitalize<Last>} ${Capitalize<First>}`: T
+
+type Rail = ReverseName<'wang rail'>;
+
+declare function handler<Str extends string>(arg: `Guess who is ${Str}`): Str;
+
+handler(`Guess who is Linbudu`); // "Linbudu"
+handler(`Guess who is `); // ""
+handler(`Guess who is  `); // " "
+
+type PickByValueTypePlus<T extends Record<string,any>,V> = {
+  [K in keyof T as T[K] extends V ? K : never] :T[K]
+}
+
+type OmitByValueTypePlus<T extends Record<string,any>,V> = {
+  [K in keyof T as T[K] extends V ? never : K] :T[K]
+}
+
+type OMP = {
+  name:string,
+  age?:number
+}
+type TOMP = OmitByValueTypePlus<OMP,string>

@@ -581,3 +581,90 @@ type OMP = {
   age?:number
 }
 type TOMP = OmitByValueTypePlus<OMP,string>
+
+//模板字符串类型进阶
+
+
+type _Include<T extends string,S extends string> = T extends `${infer _R1}${S}${infer _R2}` ? true :false
+
+
+type Include<T extends string,S extends string> = T extends '' ? S extends '' ? true : false : _Include<T,S>
+
+
+
+expectType<Include<'',''>>(true)
+
+
+type TrimStart<T extends string> = T extends ` ${infer R}` ? TrimStart<R> : T
+
+type TrimEnd<T extends string> = T extends `${infer R} ` ? TrimEnd<R> : T
+
+type Trim<T extends string> = TrimStart<TrimEnd<T>>
+
+expectType<Trim<'    Rail Wang     '>>("Rail Wang")
+
+
+type _StartWith<T extends string,S extends string> = T extends `${S}${infer R}` ? true : false
+
+
+type StartWith<T extends string,S extends string> = T extends '' ? S extends '' ? true : false : _StartWith<T,S>
+
+
+expectType<StartWith<'',''>>(true)
+
+
+//结构转换：Replace、Split 与 Joins
+
+
+type Replace<T extends string,S extends string,R extends string> = T extends `${infer Head}${S}${infer Tail}` ? 
+
+`${Head}${R}${Tail}` : T
+
+
+expectType<Replace<'hello ',' ',' world'>>('hello world')
+
+
+type ReplaceAll<T extends string,S extends string,R extends string> = T extends `${infer Head}${S}${infer Tail}` ? 
+ReplaceAll<`${Head}${R}${Tail}`,S,R> : T
+
+
+expectType<ReplaceAll<'hellol','l','2'>>('he22o2')
+
+type ReplacePlus<T extends string,S extends string,R extends string,ShouldReplaceAll extends boolean = false> = 
+T extends `${infer Head}${S}${infer Tail}` ? ShouldReplaceAll extends true ? ReplaceAll<`${Head}${R}${Tail}`,S,R>:
+`${Head}${R}${Tail}` : T
+
+expectType<ReplacePlus<'hellol','l','1',true>>('he11o1')
+
+type Split<T extends string,D extends string> = T extends `${infer Head}${D}${infer Tail}` ? [Head,...Split<Tail,D>] :
+T extends D ? []:[T]
+
+type ST = Split<'1,2,3','-'>
+
+
+
+// ["linbudu", "599", "fe"]
+type SplitRes1 = Split<'linbudu,599,fe', ','>;
+
+// ["linbudu", "599", "fe"]
+type SplitRes2 = Split<'linbudu 599 fe', ' '>;
+
+// ["l", "i", "n", "b", "u", "d", "u"]
+type SplitRes3 = Split<'linbudu', ''>;
+
+type Delimiters = '-' | '_' | ' ';
+type SplitRes4 = Split<'lin_bu_du', Delimiters>;
+
+
+// ["lin" | "lin_bu", "du"] | ["lin" | "lin_bu", "bu", "du"]
+type SplitRes5 = Split<'lin_bu-du', Delimiters>;
+
+
+export type StrLength<T extends string> = Split<Trim<T>, ''>['length'];
+
+type StrLengthRes1 = StrLength<'linbudu'>; // 7
+type StrLengthRes2 = StrLength<'lin budu'>; // 8
+type StrLengthRes3 = StrLength<''>; // 0
+type StrLengthRes4 = StrLength<' '>; // 0
+
+

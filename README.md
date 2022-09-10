@@ -122,5 +122,25 @@
   - 模板字符串类型与模式匹配
   - 基于重映射的 PickByValueType
 
+  **进阶开始**
 
+        type TrimStart<T extends string> = T extends ` ${infer R}` ? TrimStart<R> : T
+        type TrimEnd<T extends string> = T extends `${infer R} ` ? TrimEnd<R> : Trim
+        type Trim<T extends string> = TrimStart<TrimEnd<T>>
+
+        type _Include<T extends string,S extends string> = T extends `${infer _R1}${S}${infer _R2}` ? true :false
+
+        type Include<T extends string,S extends string> = T extends '' ? S extends '' ? true : false : _Include<T,S>
+
+        type _StartWith<T extends string,S extends string> = T extends `${S}${infer R}` ? true : false
+        type StartWith<T extends string,S extends string> = T extends '' ? S extends '' ? true : false : _StartWith<T,S>
+
+    - 结构转换
+        
+            type Replace<T extends string,S extends string,R extends string> = T extends `${infer Head}${S}${infer Tail}` ?
+            `${Head}${R}${Tail}` : T
+
+            type ReplaceAll<T extends string,S extends string,R extends string> = T extends `${infer Head}${S}${infer Tail}` ? ReplaceAll<`${Head}${S}${Tail}`,S,R> : Tail
+
+            type ReplacePlus<T extends string,S extends string,R extends string,ShouldReplaceAll extends boolean = false> = T extends `${infer Head}${S}${infer Tail}` ? ShouldReplaceAll extends true ? ReplaceAll<`${Head}${R}${Tail}`,S,R> : `${Head}${R}${Tail}` : T
 

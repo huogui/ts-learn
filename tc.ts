@@ -362,7 +362,7 @@ type PlainObjectType = Record<string,any>
 type ObjectKeysConcurrence<T extends PlainObjectType,U extends PlainObjectType> = keyof T | keyof U;
 
 
-type OC = ObjectKeysConcurrence<{'a':number},{'a':number,'b':number}>
+type OKC = ObjectKeysConcurrence<{'a':number},{'a':number,'b':number}>
 
 
 //属性名交集
@@ -397,4 +397,49 @@ type OD = ObjectDifference<{'a':number,'b':number},{'a':number}>
 
 //Complement 补充
 
-type ObjectComplement<T extends U,U extends PlainObjectType>
+type ObjectComplement<T extends U,U extends PlainObjectType> = Pick<T,ObjectKeysComplement<T,U>>
+
+type OC = ObjectComplement<{'a':number,'b':number,c:string},{'a':number,b:number}>
+
+
+type Merge<T extends Record<string,any>,U extends Record<string,any>> = 
+   ObjectDifference<T,U> & ObjectIntersection<U,T> & ObjectDifference<U,T>
+type MG = Flatten<Merge<{'a':number,'b':number,c:string},{'a':number,b:number}>>
+
+
+
+// 模式匹配工具类型进阶
+
+
+type FirstParameter<T extends (...args:any[])=>any> = T extends (arg:infer Head,args:any)=>any ? Head: never 
+
+
+type FunctionType = (...args: any) => any;
+
+type LastParameter<T extends FunctionType> = T extends (arg:infer P)=>any ? P : T extends (...arg: infer R)=>any? R extends [...any,infer Q]? Q:never: never
+
+
+
+type FT = LastParameter<(a:string,b:number,c:boolean,d:symbol)=>string>
+
+
+
+type S = {} extends {prop:number} ? "Y" : "N"
+type S1= {} extends {prop?:number} ? "Y" : "N"
+
+
+
+
+type requiredKeys<T extends Record<keyof any,any>> = {
+  [K in keyof T]-? : {} extends Pick<T,K> ? never : K
+}[keyof T]
+
+
+export type OptionalKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
+}[keyof T];
+
+type TR = OptionalKeys<{
+  name?:string,
+  age:number
+}>

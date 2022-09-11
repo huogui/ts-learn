@@ -668,3 +668,52 @@ type StrLengthRes3 = StrLength<''>; // 0
 type StrLengthRes4 = StrLength<' '>; // 0
 
 
+// join
+
+type Join<T extends Array<string|number>,D extends string> = 
+T extends [] ? '' : T extends [string | number] ? 
+`${T[0]}` : T extends [string | number,...infer R] ? 
+//@ts-expect-error
+`${T[0]}${D}${Join<R,D>}`:string
+
+
+// `lin-bu-du-${string}`
+type JoinRes1 = Join<['lin', 'bu', 'du'], '-'>;
+
+// Case处理
+
+type SnakeCase2CamelCase<T extends string> = T extends `${infer Head}_${infer Tail}` ? `${SnakeCase2CamelCase<`${`${Head}${Capitalize<Tail>}`}`>}` : T
+
+
+type KeBabCase<T extends string> = T extends `${infer Head}${'-'}${infer R}` ? `${KeBabCase<`${Head}${Capitalize<R>}`>}` : T
+
+expectType<SnakeCase2CamelCase<'foo_bar_baz'>>('fooBarBaz');
+expectType<KeBabCase<'foo-bar-baz'>>('fooBarBaz');
+
+
+
+type DelimiterCaseCamelCase<T extends string,Delimiter extends string> = T extends `${infer Head}${Delimiter}${infer R}` ? `${Head}${DelimiterCaseCamelCase<`${Capitalize<R>}`,Delimiter>}` : T 
+
+
+type Delimiter = '-' | '_' | ' ' | '~';
+
+
+type CapitalizeArrayToString<T extends any[]> = T extends [`${infer Head}`,...infer R] ? `${Capitalize<Head>}${CapitalizeArrayToString<R>}` : ''
+
+
+
+type CamelCaseStringArray<Words extends string[]> = Words extends [
+  `${infer First}`,
+  ...infer Rest
+]
+  ? `${First}${CapitalizeArrayToString<Rest>}`
+  : never;
+
+  type CamelCase<K extends string> = CamelCaseStringArray<
+  Split<K, Delimiters>
+>;
+expectType<DelimiterCaseCamelCase<'foo-bar-baz', Delimiter>>('fooBarBaz');
+expectType<DelimiterCaseCamelCase<'foo~bar~baz', Delimiter>>('fooBarBaz');
+expectType<DelimiterCaseCamelCase<'foo bar baz', Delimiter>>('fooBarBaz');
+
+expectType<CamelCase<'foo bar baz'>>('fooBarBaz');

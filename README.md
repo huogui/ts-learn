@@ -144,3 +144,18 @@
 
             type ReplacePlus<T extends string,S extends string,R extends string,ShouldReplaceAll extends boolean = false> = T extends `${infer Head}${S}${infer Tail}` ? ShouldReplaceAll extends true ? ReplaceAll<`${Head}${R}${Tail}`,S,R> : `${Head}${R}${Tail}` : T
 
+            type Join<T extends Array<string | number>,D extends string> = T extends [] ? '' : T extends [string | number]
+            ? `${T[0]}` :
+             T extends [string | number,...infer R] ? 
+             // @ts-expect-error
+             `${T[0]}${D}${Join<R,D>}` : string
+
+            
+            type SnakeCase2CamelCase<S extends string> =
+            S extends `${infer Head}${'_'}${infer Rest}`
+                ? `${Head}${SnakeCase2CamelCase<Capitalize<Rest>>}`
+                : S;
+
+            expectType<SnakeCase2CamelCase<'foo_bar_baz'>>('fooBarBaz');
+
+            type DelimiterCaseCamelCase<T extends string,Delimiter extends string> = T extends `${infer Head}${Delimiter}${infer R}` ? `${Head}${DelimiterCaseCamelCase<`${Capitalize<R>}`,Delimiter>}` : T 

@@ -717,3 +717,55 @@ expectType<DelimiterCaseCamelCase<'foo~bar~baz', Delimiter>>('fooBarBaz');
 expectType<DelimiterCaseCamelCase<'foo bar baz', Delimiter>>('fooBarBaz');
 
 expectType<CamelCase<'foo bar baz'>>('fooBarBaz');
+
+
+
+
+
+//Case 转换 再来一遍
+
+
+
+ type WordSeparators = '-' | '_' | ' ';
+
+
+
+type CapitalizeStringArray<Words extends readonly any[], Prev> = Words extends [
+  `${infer First}`,
+  ...infer Rest
+]
+  ? First extends undefined
+    ? ''
+    : First extends ''
+    ? CapitalizeStringArray<Rest, Prev>
+    : `${Prev extends '' ? First : Capitalize<First>}${CapitalizeStringArray<
+        Rest,
+        First
+      >}`
+  : '';
+
+type CamelCaseStringArrayPlus<Words extends readonly string[]> = Words extends [
+  `${infer First}`,
+  ...infer Rest
+]
+  ? Uncapitalize<`${First}${CapitalizeStringArray<Rest, First>}`>
+  : never;
+
+export type CamelCasePlus<K extends string> = CamelCaseStringArrayPlus<
+  Split<K extends Uppercase<K> ? Lowercase<K> : K, WordSeparators>
+>;
+
+export type CamelCasedProperties<T extends PlainObjectType> = {
+  [K in keyof T as CamelCase<string & K>]: T[K] extends object
+    ? CamelCasedProperties<T[K]>
+    : T[K];
+};
+
+expectType<
+  CamelCasedProperties<{ foo_bar: string; foo_baz: { nested_foo: string } }>
+>({
+  fooBar: '',
+  fooBaz: {
+    nestedFoo: '',
+  },
+});

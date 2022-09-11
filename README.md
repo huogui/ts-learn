@@ -158,4 +158,33 @@
 
             expectType<SnakeCase2CamelCase<'foo_bar_baz'>>('fooBarBaz');
 
-            type DelimiterCaseCamelCase<T extends string,Delimiter extends string> = T extends `${infer Head}${Delimiter}${infer R}` ? `${Head}${DelimiterCaseCamelCase<`${Capitalize<R>}`,Delimiter>}` : T 
+            type DelimiterCaseCamelCase<T extends string,Delimiter extends string> = T extends `${infer Head}${Delimiter}${infer R}` ? `${Head}${DelimiterCaseCamelCase<`${Capitalize<R>}`,Delimiter>}` : T  
+            
+            type WordSeparators = '-' | '_' | ' ';
+
+
+
+            type CapitalizeStringArray<Words extends readonly any[], Prev> = Words extends [
+            `${infer First}`,
+            ...infer Rest
+            ]
+            ? First extends undefined
+                ? ''
+                : First extends ''
+                ? CapitalizeStringArray<Rest, Prev>
+                : `${Prev extends '' ? First : Capitalize<First>}${CapitalizeStringArray<
+                    Rest,
+                    First
+                >}`
+            : '';
+
+            type CamelCaseStringArrayPlus<Words extends readonly string[]> = Words extends [
+            `${infer First}`,
+            ...infer Rest
+            ]
+            ? Uncapitalize<`${First}${CapitalizeStringArray<Rest, First>}`>
+            : never;
+
+            export type CamelCasePlus<K extends string> = CamelCaseStringArrayPlus<
+            Split<K extends Uppercase<K> ? Lowercase<K> : K, WordSeparators>
+            >;

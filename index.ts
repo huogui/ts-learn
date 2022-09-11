@@ -10,7 +10,7 @@
 
 */
 
-func22tion sum(n1:number,n2:number):number{
+function sum(n1:number,n2:number):number{
     return n1 + n2
 }
 
@@ -61,7 +61,7 @@ interface IDescription {
     name: string;
     age: number;
     male?: boolean;
-    func22?: Func22tion;
+    func22?: ()=>void;
   }
 
   const obj2: IDescription = {
@@ -86,11 +86,8 @@ const uniqueSymbolFoo:  symbol = Symbol("linbudu")
 const uniqueSymbolBar:  symbol = uniqueSymbolFoo
 
 
-func22tion test(a:string):string | void{
-    return a
-}
 
-test('te')
+
 
 function reset(arg1:string,...reset:[string,number,boolean]){
 

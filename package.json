@@ -1,5 +1,9 @@
 {
 	"dependencies": {
 		"tsd": "^0.23.0"
+	},
+	"devDependencies": {
+		"@types/node": "^18.7.16",
+		"webpack": "^5.74.0"
 	}
 }

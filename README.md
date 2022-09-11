@@ -188,3 +188,19 @@
             export type CamelCasePlus<K extends string> = CamelCaseStringArrayPlus<
             Split<K extends Uppercase<K> ? Lowercase<K> : K, WordSeparators>
             >;
+
+# 类型检查指令
+
+    //@ts-ignore
+    //@ts-expect-error
+    //@ts-nocheck
+    //@ts-check
+# 类型声明
+
+    declare
+
+    module
+
+    namespace
+
+ *三斜线指令*

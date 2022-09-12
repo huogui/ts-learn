@@ -15,3 +15,10 @@ const config = {
 }
 
 module.exports = config
+
+
+function test() {
+    this.name = 123
+}
+
+test()

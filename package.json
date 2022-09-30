@@ -3,7 +3,7 @@
 		"tsd": "^0.23.0"
 	},
 	"scripts": {
-		"eslint": "eslint src/ --ext .js,.vue, .jsx, .ts, .tsx --cache",
+		"eslint": "eslint src/ --ext .ts --cache",
 		"eslint:fix": "npm run eslint -- --fix",
 		"prettier": "prettier --check .",
 		"prettier:fix": "prettier --write .",
@@ -11,13 +11,9 @@
 		"lint:fix": "npm run eslint:fix && npm run prettier:fix"
 	},
 	"devDependencies": {
+		"@huogui/eslint-config": "^1.0.30",
 		"@types/node": "^18.7.16",
-		"@typescript-eslint/eslint-plugin": "^5.36.2",
-		"@typescript-eslint/parser": "^5.36.2",
 		"eslint": "^8.23.1",
-		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-vue": "^9.4.0",
-		"prettier": "^2.7.1",
-		"webpack": "^5.74.0"
+		"typescript": "^4.8.4"
 	}
 }

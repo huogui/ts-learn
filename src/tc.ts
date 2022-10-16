@@ -158,7 +158,6 @@ type DeepNullable<T extends object> = {
   [K in keyof T]:T[K] extends object?DeepNullable<T[K]>:Nullable<T[K]>
 }
 
-
 type MarkPropsAsRequired<T extends object,K extends keyof T = keyof T> = Flatten<DeepRequired<Pick<T,K>> & Omit<T,K>>
 
 

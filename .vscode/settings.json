@@ -4,4 +4,7 @@
         "source.fixAll": true,
     },
     "prettier.enable": false,
+    "cSpell.words": [
+        "huogui"
+    ],
 }

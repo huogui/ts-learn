@@ -15,7 +15,7 @@ A extends [infer Head, ...infer Reset] ?
 
 type Zip2<A extends unknown[], B extends unknown[]> = A extends [...infer Reset, infer Tail] ? B extends [...infer OtherReset, infer OtherTail] ? [ ...Zip2<Reset, OtherReset>, [Tail, OtherTail]] : [] : []
 
-type ZipResult = Zip<[1, 2, 3], ['guang', 'guang', 'guang']>
-type Zip2Result = Zip2<[1, 2, 3], ['guang', 'guang', 'guang']>
+type ZipResult = Zip<[1, 2, 3], ['huogui', 'huogui', 'huogui']>
+type Zip2Result = Zip2<[1, 2, 3], ['huogui', 'huogui', 'huogui']>
 
 type CapitalizeStr<Str extends string> = Str extends `${infer Head}${infer Reset}` ? `${Uppercase<Head>}${Reset}` : Str

@@ -25,3 +25,8 @@ type BEM<Block extends string, Element extends string[], Modifiers extends strin
 
 type bem = BEM<'huogui', ['aaa', 'bbb'], ['warning', 'success']>
 
+type Combinations<A extends string, B extends string> = A | B | `${A}${B}` | `${B}${A}`
+
+type AllCombinations<A extends string, B extends string = A> = A extends A ? Combinations<A, AllCombinations<Exclude<B, A>>> : never
+
+type AResult = AllCombinations<'a' | 'b' | 'c'>
